@@ -52,7 +52,7 @@ public class Person {
     public Passport getPassport() {
         return passport;
     }
-    // Всегда будет выполняться двусторонняя связь
+    //
     public void setPassport(Passport passport) {
         this.passport = passport;
         passport.setPerson(this);

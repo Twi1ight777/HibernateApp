@@ -27,6 +27,18 @@ public class Passport {
     public Passport(int passportNumber) {
         this.passportNumber = passportNumber;
     }
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+    public Person getPerson() {
+        return person;
+    }
+    public void setPerson(Person person) {
+        this.person = person;
+    }
 
     public int getPassportNumber() {
         return passportNumber;
