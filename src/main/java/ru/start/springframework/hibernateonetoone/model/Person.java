@@ -1,9 +1,6 @@
-package ru.start.springframework.hibernateonetomany.model;
+package ru.start.springframework.hibernateonetoone.model;
 
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity // Сущность
 @Table(name = "Person") // Название таблицы
@@ -20,8 +17,9 @@ public class Person {
     @Column(name = "age") // Название столбца возраста
     private int age;
 
-    @OneToMany (mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.DETACH}) // Делаем ссылку на owner
-    private List<Item> items;
+    @OneToOne(mappedBy = "person", cascade = {CascadeType.PERSIST, CascadeType.DETACH}) // Делаем ссылку на person
+    private Passport passport; // Связь один к одному, внешний ключ совпадает с id в таблице Passport
+
 
     public Person() {
     }
@@ -51,11 +49,13 @@ public class Person {
         this.age = age;
     }
 
-    public List<Item> getItems() {
-        return items;
+    public Passport getPassport() {
+        return passport;
     }
-    public void setItems(List<Item> items) {
-        this.items = items;
+    // Всегда будет выполняться двусторонняя связь
+    public void setPassport(Passport passport) {
+        this.passport = passport;
+        passport.setPerson(this);
     }
 
     public String toString() {
@@ -64,12 +64,5 @@ public class Person {
                 ", name='" + name + '\'' +
                 ", age=" + age +
                 '}';
-    }
-    public void addItem(Item item) {
-        if (this.items == null) {
-            this.items = new ArrayList<>();
-        }
-        this.items.add(item);
-        item.setOwner(this);
     }
 }
