@@ -27,14 +27,27 @@ public class App
 
         try {
             session.beginTransaction();
-            /// Изменяем владельца товара
-            Person person = session.get(Person.class,4);
-            Item item = session.get(Item.class,1);
-            // Удаляем у старого владельца товар
-            item.getOwner().getItems().remove(item);
-            // Добавляем нового владельца на товар в двух таблицах
-            item.setOwner(person);
-            person.getItems().add(item);
+            /// Каскадирование в Hibernate. В базу данных добавляется 1 человек и 3 товара связанные с ним
+            Person person = new Person("Test cascading",30);
+            // У айтема есть человек person
+            person.addItem(new Item("Item 1"));
+            person.addItem(new Item("Item 2"));
+            person.addItem(new Item("Item 3"));
+
+            // В чем разница между Persist и Save?
+            session.persist(person);
+            //session.persist(item);
+            ///Разница между Persist и Save. Save - из самой библиотеки Hibernate(нет в JPA);
+            /// Возвращает значение первичного ключа для добавленной сущности;
+            /// Гарантирует, что значение первичного ключа будет определено сразу же после вызова.
+//            /// Изменяем владельца товара
+//            Person person = session.get(Person.class,4);
+//            Item item = session.get(Item.class,1);
+//            // Удаляем у старого владельца товар
+//            item.getOwner().getItems().remove(item);
+//            // Добавляем нового владельца на товар в двух таблицах
+//            item.setOwner(person);
+//            person.getItems().add(item);
 ///            // Удаление человека
 //            Person person = session.get(Person.class,2);
 //            // SQL

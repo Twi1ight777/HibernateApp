@@ -2,6 +2,7 @@ package ru.start.springframework.hibernateonetomany.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity // Сущность
@@ -19,7 +20,7 @@ public class Person {
     @Column(name = "age") // Название столбца возраста
     private int age;
 
-    @OneToMany (mappedBy = "owner") // Делаем ссылку на owner
+    @OneToMany (mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.DETACH}) // Делаем ссылку на owner
     private List<Item> items;
 
     public Person() {
@@ -63,5 +64,12 @@ public class Person {
                 ", name='" + name + '\'' +
                 ", age=" + age +
                 '}';
+    }
+    public void addItem(Item item) {
+        if (this.items == null) {
+            this.items = new ArrayList<>();
+        }
+        this.items.add(item);
+        item.setOwner(this);
     }
 }
