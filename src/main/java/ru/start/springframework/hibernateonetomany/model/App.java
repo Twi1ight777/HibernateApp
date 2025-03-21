@@ -1,15 +1,11 @@
-package ru.start.springframework.hibernateonetomany;
+package ru.start.springframework.hibernateonetomany.model;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import ru.start.springframework.hibernateonetomany.model.Person;
-import ru.start.springframework.hibernateonetomany.model.Item;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import ru.start.springframework.hibernateonetomany.model.model.Item;
+import ru.start.springframework.hibernateonetomany.model.model.Person;
 
 public class App
 {

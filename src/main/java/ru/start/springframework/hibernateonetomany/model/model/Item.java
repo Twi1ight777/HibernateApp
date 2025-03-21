@@ -1,4 +1,4 @@
-package ru.start.springframework.hibernateonetomany.model;
+package ru.start.springframework.hibernateonetomany.model.model;
 
 import jakarta.persistence.*;
 
@@ -22,6 +22,7 @@ public class Item {
     public Item(String name) {
         this.itemName = name;
     }
+
     public int getId() {
         return id;
     }
