@@ -1,11 +1,14 @@
 package ru.start.springframework.hibernateonetomany;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import ru.start.springframework.hibernateonetomany.model.Item;
 import ru.start.springframework.hibernateonetomany.model.Person;
+
+import java.util.List;
 
 public class App
 {
@@ -18,21 +21,63 @@ public class App
         StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties());
 
-        SessionFactory sessionFactory = configuration.buildSessionFactory(builder.build());
-        Session session = sessionFactory.getCurrentSession();
-
-        try {
+        try (SessionFactory sessionFactory = configuration.buildSessionFactory(builder.build())) {
+            Session session = sessionFactory.getCurrentSession();
             session.beginTransaction();
-            /// Каскадирование в Hibernate. В базу данных добавляется 1 человек и 3 товара связанные с ним
-            Person person = new Person("Test cascading",30);
-            // У айтема есть человек person
-            person.addItem(new Item("Item 1"));
-            person.addItem(new Item("Item 2"));
-            person.addItem(new Item("Item 3"));
 
-            // В чем разница между Persist и Save?
-            session.persist(person);
-            //session.persist(item);
+            Person person = session.get(Person.class, 1);
+            System.out.println("Получили человека из таблицы");
+            // Получим связанные сущности (Lazy loading)
+//            System.out.println(person);
+//            // Компилятор Java оптимизирует код и не вызывает person.getItems() - из-за чего возникает ошибка
+////            System.out.println(person.getItems());
+//            // Явно подгружаем сущности (Lazy loading)
+//            Hibernate.initialize(person.getItems());
+
+//            Item item = session.get(Item.class,1);
+//            System.out.println("Получили товар");
+//            // Тк. @ManyToOne по дефолту стоит Eager loading, при вызове геттера - Select не вызывается
+//            System.out.println(item.getOwner());
+
+            session.getTransaction().commit();
+            //session.close();
+            System.out.println("Сессия закончилась (session.close)");
+
+            // Открываем сессию и транзакцию еще раз (в любом месте кода)
+            session = sessionFactory.getCurrentSession();
+            session.beginTransaction();
+
+            System.out.println("Внутри второй транзакции");
+
+            person = (Person) session.merge(person); // merge притягивает объект к новой сессии
+            Hibernate.initialize(person.getItems());
+
+//            // Загружаем коллекцию items с помощью HQL. Без подгрузки товаров.
+//            String hql = "SELECT i FROM Item i WHERE i.owner.id=:personId";
+//            List<Item> items = session.createQuery(hql, Item.class)
+//                    .setParameter("personId", person.getId())
+//                    .getResultList();
+//            System.out.println(items);
+
+            session.getTransaction().commit();
+
+            System.out.println("Вне второй сессии");
+            // Вне сессии товары можем получать - они уже были подгружены.
+            System.out.println("Товары:");
+            for (Item i : person.getItems()) {
+                System.out.println(i);
+            }
+
+            /// Каскадирование в Hibernate. В базу данных добавляется 1 человек и 3 товара связанные с ним
+//            Person person = new Person("Test cascading", 30);
+//            // У item есть человек
+//            person.addItem(new Item("Item 1"));
+//            person.addItem(new Item("Item 2"));
+//            person.addItem(new Item("Item 3"));
+//
+//            // В чем разница между Persist и Save?
+//            session.persist(person);
+//            //session.persist(item);
             ///Разница между Persist и Save. Save - из самой библиотеки Hibernate(нет в JPA);
             /// Возвращает значение первичного ключа для добавленной сущности;
             /// Гарантирует, что значение первичного ключа будет определено сразу же после вызова.
@@ -88,10 +133,7 @@ public class App
 //            List<Item> items = person.getItems();
 //            System.out.println("Items loaded: " + items);
 
-            session.getTransaction().commit();
-
-        } finally {
-            sessionFactory.close();
+//            session.getTransaction().commit();
         }
     }
 }
